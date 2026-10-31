@@ -1,0 +1,14 @@
+{
+    "Play_Button": {
+        "Width":  300,
+        "Height": 50,
+        "Play_Button_Y": 250,
+        "Play_Button_X": 250
+    },
+    "Play_Button2": {
+        "Width2":  40,
+        "Height2": 40,
+        "Play_Button_Y2": 310,
+        "Play_Button_X2": 265
+    }
+}

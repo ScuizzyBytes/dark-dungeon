@@ -26,3 +26,13 @@ def load_idle_animations():
     
     return idle_anim
 
+def load_attack_animations():
+    idle_anim = [
+        pygame.transform.scale(pygame.image.load("dark-dungeon/assets/attack_frames/attack_anim/attack_00.png").convert_alpha(), (60, 70)),
+        pygame.transform.scale(pygame.image.load("dark-dungeon/assets/attack_frames/attack_anim/attack_01.png").convert_alpha(), (60, 70)),
+        pygame.transform.scale(pygame.image.load("dark-dungeon/assets/attack_frames/attack_anim/attack_02.png").convert_alpha(), (60, 70)),
+        pygame.transform.scale(pygame.image.load("dark-dungeon/assets/attack_frames/attack_anim/attack_03.png").convert_alpha(), (60, 70)),
+        pygame.transform.scale(pygame.image.load("dark-dungeon/assets/attack_frames/attack_anim/attack_04.png").convert_alpha(), (60, 70))
+    ]
+    
+    return idle_anim

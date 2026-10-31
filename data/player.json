@@ -1,0 +1,29 @@
+{
+    "stats": {
+        "Name": "John",
+        "Age": 15,
+        "Country": "HollowWay",
+        "Health": 15,
+        "Speed": 3.5,
+        "Damage": 20
+    },
+    "state": {
+        "is_walking": false,
+        "attacking": false,
+        "fliped": false,
+        "player_anim_walk": 0,
+        "player_anim_idle": 0,
+        "player_anim_attack": 0
+    },
+    "inventory": {
+        "Items": [
+            "Rusty Axe",
+            "Roten Fish"
+        ],
+        "equipment": {
+            "weapon": "Rusty Axe",
+            "armor": "Leather Tunic"
+        }    
+    }
+}
+

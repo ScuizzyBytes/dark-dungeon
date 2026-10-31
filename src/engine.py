@@ -1,22 +1,34 @@
+import json
 import sys
 
 import pygame
-from animation import load_idle_animations, load_walk_animations
+from src.frames_load import (
+    load_attack_animations,
+    load_idle_animations,
+    load_walk_animations,
+)
 
 pygame.init()
+
+with open("dark-dungeon/data/player.json", "r", encoding="utf-8") as f:
+    player_data = json.load(f)
+    
+with open("dark-dungeon/data/main_menu.json", "r", encoding="utf-8") as f:
+    main_menu_data = json.load(f)
 
 class Game:
     def __init__(self) -> None:
         
-        # Variables
+        # Game Variables
         W, H = 800, 600
         self.screen = pygame.display.set_mode((W, H))
+        pygame.display.set_caption("The Last Vein")
         self.clock = pygame.time.Clock()
         self.FPS = 60
         self.GROUND_X, self.GROUND_Y = 400, 500
         self.Block_x, self.Block_y = 0, 550
-        self.fliped = False
         self.running = True
+        self.Main_Menu = True
         
         # Jumping Variables
         self.Jumping_High = 15
@@ -27,24 +39,59 @@ class Game:
         self.ground_level = 490
         
         # Animations Variables
-        self.player_anim_walk = 0
-        self.player_anim_idle = 0
-        self.is_walking = False
+        self.is_walking = player_data["state"]["is_walking"]
+        self.attacking = player_data["state"]["attacking"]
+        self.fliped = player_data["state"]["fliped"]
+        self.player_anim_walk = player_data["state"]["player_anim_walk"]
+        self.player_anim_idle = player_data["state"]["player_anim_idle"]
+        self.player_anim_attack = player_data["state"]["player_anim_attack"]
+        
+        # Buttons Variables
+        self.Play_Button_Y = main_menu_data["Play_Button"]["Play_Button_Y"]
+        self.Play_Button_X = main_menu_data["Play_Button"]["Play_Button_X"]
+        self.Button_Width = main_menu_data["Play_Button"]["Width"]
+        self.Button_Height = main_menu_data["Play_Button"]["Height"]
+        
+        # Buttons2 Variables
+        self.Play_Button_Y2 = main_menu_data["Play_Button2"]["Play_Button_Y2"]
+        self.Play_Button_X2 = main_menu_data["Play_Button2"]["Play_Button_X2"]
+        self.Button_Width2 = main_menu_data["Play_Button2"]["Width2"]
+        self.Button_Height2 = main_menu_data["Play_Button2"]["Height2"]
         
         # Images
         self.player_image = pygame.image.load("dark-dungeon/assets/player.png").convert_alpha()
         self.block_image = pygame.image.load("dark-dungeon/assets/block1.png").convert_alpha()
         self.block1_image = pygame.image.load("dark-dungeon/assets/block.png").convert_alpha()
         self.background = pygame.image.load("dark-dungeon/assets/background.png").convert_alpha()
+        self.settings_image = pygame.image.load("dark-dungeon/assets/settings.png").convert_alpha()
         
         # Scaled Images
         self.scale_background = pygame.transform.scale(self.background, (W, H))
         self.scaled_block = pygame.transform.scale(self.block_image, (15, 15))
         self.scaled_block1 = pygame.transform.scale(self.block1_image, (15, 20))
         self.scaled_player = pygame.transform.scale(self.player_image, (60, 70))
-
+        self.scaled_settings = pygame.transform.scale(self.settings_image, (40, 40))
+        
+        small_bg = pygame.transform.smoothscale(self.scale_background, (W // 10, H // 10))
+        self.blured_bg = pygame.transform.smoothscale(small_bg, (W, H))
+        
         # ColorKeys
         self.scaled_player.set_colorkey((255, 255, 255))
+        self.scaled_settings.set_colorkey((255, 255, 255))
+        
+        # Button
+        self.button_rect = pygame.Rect(self.Play_Button_X, self.Play_Button_Y, self.Button_Width, self.Button_Height)
+        self.button_rect2 = pygame.Rect(self.Play_Button_X2, self.Play_Button_Y2, self.Button_Width2, self.Button_Height2)
+        
+        # Overlay Settings
+        self.overlay = pygame.Surface((W, H))
+        self.overlay.fill((0, 0, 0))
+        self.overlay.set_alpha(128)
+        
+        # Font Settings
+        self.font = pygame.font.SysFont(None, 60)   
+        self.font2 = pygame.font.SysFont(None, 120)
+        self.font3 = pygame.font.SysFont(None, 120)
         
         # Block Layers
         self.blocks = [(x, 550) for x in range(0, 800, 15)]
@@ -54,14 +101,41 @@ class Game:
         
         self.walk_images = load_walk_animations()
         self.idle_images = load_idle_animations()
+        self.attack_images = load_attack_animations()
     
     def run(self):
         while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    print()
+                elif event.type == pygame.MOUSEBUTTONDOWN:  # noqa: SIM102
+                    if event.button == 1:  # noqa: SIM102
+                        if self.button_rect.collidepoint(event.pos):  # noqa: SIM102
+                            if self.Main_Menu:
+                                self.Main_Menu = False
+                    
+            if self.Main_Menu:          
+                self.screen.blit(self.blured_bg, (0, 0))
+                self.screen.blit(self.overlay, (0, 0))
+                
+                pygame.draw.rect(self.screen, (43, 176, 23), self.button_rect, border_radius=8)
+                pygame.draw.rect(self.screen, (0, 0, 0), self.button_rect, width=4, border_radius=8)
+                
+                pygame.draw.rect(self.screen, (89, 89, 89), self.button_rect2, border_radius=8)
+                pygame.draw.rect(self.screen, (0, 0, 0), self.button_rect2, width=4, border_radius=8)
+                
+                self.text_surface = self.font.render("Play", True, (0, 0, 0))
+                self.text_surface2 = self.font2.render("The Last Vein", True, (0, 0, 0))
+                self.text_surface3 = self.font3.render("The Last Vein", True, (36, 89, 43))
+                
+                self.screen.blit(self.text_surface, (350, 255))
+                self.screen.blit(self.text_surface2, (140, 120))
+                self.screen.blit(self.text_surface3, (142.5, 122.5))
+                self.screen.blit(self.text_surface2, (145, 125))
+                self.screen.blit(self.scaled_settings, (265, 310))
+                
+                pygame.display.flip()
+                continue
                 
             self.screen.fill((0, 0, 0))
             self.screen.blit(self.scale_background, (0, 0))
@@ -97,6 +171,7 @@ class Game:
                 self.fliped = False
                 self.is_walking = True
                 self.player_anim_idle = 0
+                
             if keys[pygame.K_d]:
                 self.GROUND_X += 4
                 self.fliped = True
@@ -111,6 +186,25 @@ class Game:
                 frames_index2 = (self.player_anim_idle // 6) % len(self.idle_images)
                 self.current_image = self.idle_images[frames_index2]
                 self.player_anim_idle += 1
+            
+            if  self.attacking:
+                self.player_anim_attack += 1
+                
+                total_duration_ticks = 24
+                ticks_per_frame = total_duration_ticks / len(self.attack_images)
+                
+                frame_index2 = int(self.player_anim_attack // ticks_per_frame)
+                
+                if frame_index2 >= len(self.attack_images):
+                    self.attacking = False
+                    self.player_anim_attack = 0
+                    frame_index2 = len(self.attack_images) - 1
+                    
+                self.current_image = self.attack_images[frame_index2]
+            else:
+                self.player_anim_idle += 1
+                idle_index = (self.player_anim_idle // 10) % len(self.idle_images)
+                self.current_image = self.idle_images[idle_index]
             
             if self.fliped:
                 self.current_image = pygame.transform.flip(self.current_image, True, False)
