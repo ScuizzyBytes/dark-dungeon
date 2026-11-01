@@ -2,7 +2,7 @@ import json
 import sys
 
 import pygame
-from src.frames_load import (
+from frames_load import (
     load_attack_animations,
     load_idle_animations,
     load_walk_animations,
@@ -120,6 +120,12 @@ class Game:
         self.button_rect6 = pygame.Rect(self.Brightness_Button_X6, self.Brightness_Button_Y6, self.Button_Width6, self.Button_Height6)
         self.button_rect7 = pygame.Rect(self.Brightness_Button_X6 + 185, self.Brightness_Button_Y6, self.Button_Width6, self.Button_Height6)
         
+        # Intro Variables
+        self.intro = True
+        self.intro_start = pygame.time.get_ticks()
+        self.intro_font = pygame.font.SysFont(None, 70)
+        self.intro_text = self.intro_font.render("Misha presents...", True, (255, 255, 255))
+        
         # Overlay Settings
         self.overlay = pygame.Surface((W, H))
         self.overlay.fill((0, 0, 0))
@@ -152,8 +158,10 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
+                elif self.intro and event.type in (pygame.KEYDOWN, pygame.MOUSEBUTTONDOWN):
+                    self.intro = False
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                    if self.Main_Menu:
+                    if self.Main_Menu: 
                         if self.button_rect.collidepoint(event.pos):
                                 self.Main_Menu = False
                         elif self.settings_rect.collidepoint(event.pos):
@@ -179,6 +187,25 @@ class Game:
                         self.settings = False
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_e and not self.settings and not self.Main_Menu:
                     self.attacking = True
+            
+            if self.intro:
+                t = (pygame.time.get_ticks() - self.intro_start) / 1000 
+
+                if t < 1:        alpha = 0                
+                elif t < 2:      alpha = (t - 1) * 255    
+                elif t < 4:      alpha = 255              
+                elif t < 5:      alpha = (5 - t) * 255    
+                else:            alpha = 0
+
+                if t >= 6:
+                    self.intro = False
+
+                self.screen.fill((0, 0, 0))
+                self.intro_text.set_alpha(int(alpha))
+                self.screen.blit(self.intro_text, self.intro_text.get_rect(center=(400, 300)))
+                pygame.display.flip()
+                self.clock.tick(self.FPS)
+                continue
                     
 
             if self.Main_Menu:          
