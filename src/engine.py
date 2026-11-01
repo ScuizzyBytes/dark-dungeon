@@ -18,7 +18,6 @@ with open("dark-dungeon/data/main_menu.json", "r", encoding="utf-8") as f:
 
 class Game:
     def __init__(self) -> None:
-        
         # Game Variables
         W, H = 800, 600
         self.screen = pygame.display.set_mode((W, H))
@@ -29,6 +28,9 @@ class Game:
         self.Block_x, self.Block_y = 0, 550
         self.running = True
         self.Main_Menu = True
+        self.settings = False
+        self.counter = 0
+        self.Brightness = 80
         
         # Jumping Variables
         self.Jumping_High = 15
@@ -53,10 +55,31 @@ class Game:
         self.Button_Height = main_menu_data["Play_Button"]["Height"]
         
         # Buttons2 Variables
-        self.Play_Button_Y2 = main_menu_data["Play_Button2"]["Play_Button_Y2"]
-        self.Play_Button_X2 = main_menu_data["Play_Button2"]["Play_Button_X2"]
-        self.Button_Width2 = main_menu_data["Play_Button2"]["Width2"]
-        self.Button_Height2 = main_menu_data["Play_Button2"]["Height2"]
+        self.Play_Button_Y2 = main_menu_data["Main_Menu_Button2"]["Main_Menu_Button_Y2"]
+        self.Play_Button_X2 = main_menu_data["Main_Menu_Button2"]["Main_Menu_Button_X2"]
+        self.Button_Width2 = main_menu_data["Main_Menu_Button2"]["Width2"]
+        self.Button_Height2 = main_menu_data["Main_Menu_Button2"]["Height2"]
+        
+        # Settings Button Variables
+        self.Settings_Button_Y3 = main_menu_data["Settings_Button"]["Settings_Button_Y3"]
+        self.Settings_Button_X3 = main_menu_data["Settings_Button"]["Settings_Button_X3"]
+        self.Button_Width3 = main_menu_data["Settings_Button"]["Width3"]
+        self.Button_Height3 = main_menu_data["Settings_Button"]["Height3"]
+        
+        self.Settings_Button_Y4 = main_menu_data["Settings_Button2"]["Settings_Button_Y4"]
+        self.Settings_Button_X4 = main_menu_data["Settings_Button2"]["Settings_Button_X4"]
+        self.Button_Width4 = main_menu_data["Settings_Button2"]["Width4"]
+        self.Button_Height4 = main_menu_data["Settings_Button2"]["Height4"]
+        
+        self.Brightness_Button_Y5 = main_menu_data["Brightness_Button"]["Settings_Button_Y5"]
+        self.Brightness_Button_X5 = main_menu_data["Brightness_Button"]["Settings_Button_X5"]
+        self.Button_Width5 = main_menu_data["Brightness_Button"]["Width5"]
+        self.Button_Height5 = main_menu_data["Brightness_Button"]["Height5"]
+        
+        self.Brightness_Button_X6 = main_menu_data["Brightness_Button2"]["Brightness_Button_X6"]
+        self.Brightness_Button_Y6 = main_menu_data["Brightness_Button2"]["Brightness_Button_Y6"]
+        self.Button_Width6 = main_menu_data["Brightness_Button2"]["Width6"]
+        self.Button_Height6 = main_menu_data["Brightness_Button2"]["Height6"]
         
         # Images
         self.player_image = pygame.image.load("dark-dungeon/assets/player.png").convert_alpha()
@@ -78,24 +101,37 @@ class Game:
         # ColorKeys
         self.scaled_player.set_colorkey((255, 255, 255))
         self.scaled_settings.set_colorkey((255, 255, 255))
+        self.settings_rect = self.scaled_settings.get_rect(topleft=(self.Settings_Button_X3, self.Settings_Button_Y3))
         
         # Button
         self.button_rect = pygame.Rect(self.Play_Button_X, self.Play_Button_Y, self.Button_Width, self.Button_Height)
         self.button_rect2 = pygame.Rect(self.Play_Button_X2, self.Play_Button_Y2, self.Button_Width2, self.Button_Height2)
+        self.button_rect3 = pygame.Rect(self.Settings_Button_X3, self.Settings_Button_Y3, self.Button_Width3, self.Button_Height3)
+        self.button_rect4 = pygame.Rect(self.Settings_Button_X4, self.Settings_Button_Y4, self.Button_Width4, self.Button_Height4)
+        self.button_rect5 = pygame.Rect(self.Brightness_Button_X5, self.Brightness_Button_Y5, self.Button_Width5, self.Button_Height5)
+        self.button_rect6 = pygame.Rect(self.Brightness_Button_X6, self.Brightness_Button_Y6, self.Button_Width6, self.Button_Height6)
+        self.button_rect7 = pygame.Rect(self.Brightness_Button_X6 + 185, self.Brightness_Button_Y6, self.Button_Width6, self.Button_Height6)
         
         # Overlay Settings
         self.overlay = pygame.Surface((W, H))
         self.overlay.fill((0, 0, 0))
         self.overlay.set_alpha(128)
         
+        self.overlay2 = pygame.Surface((W, H))
+        self.overlay2.fill((0, 0, 0))
+        self.overlay2.set_alpha(200)
+        
         # Font Settings
         self.font = pygame.font.SysFont(None, 60)   
         self.font2 = pygame.font.SysFont(None, 120)
         self.font3 = pygame.font.SysFont(None, 120)
+        self.font4 = pygame.font.SysFont(None, 100)
+        self.font5 = pygame.font.SysFont(None, 50)
+        self.font6 = pygame.font.SysFont(None, 80)
+        self.font7 = pygame.font.SysFont(None, 50)
         
         # Block Layers
         self.blocks = [(x, 550) for x in range(0, 800, 15)]
-        
         self.layer1 = [(x, 565) for x in range(0, 800, 15)]
         self.layer2 = [(x, 580) for x in range(0, 800, 15)]
         
@@ -108,12 +144,23 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
-                elif event.type == pygame.MOUSEBUTTONDOWN:  # noqa: SIM102
-                    if event.button == 1:  # noqa: SIM102
-                        if self.button_rect.collidepoint(event.pos):  # noqa: SIM102
-                            if self.Main_Menu:
+                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    if self.Main_Menu:
+                        if self.button_rect.collidepoint(event.pos):
                                 self.Main_Menu = False
+                        elif self.settings_rect.collidepoint(event.pos):
+                                self.settings = True
+                                self.Main_Menu = False
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE and not self.Main_Menu:
+                    self.settings = True
+                    self.Main_Menu = False
+                    self.counter += 1
+                    if self.counter % 2 == 0:
+                        self.settings = False
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_e and not self.settings and not self.Main_Menu:
+                    self.attacking = True
                     
+
             if self.Main_Menu:          
                 self.screen.blit(self.blured_bg, (0, 0))
                 self.screen.blit(self.overlay, (0, 0))
@@ -136,8 +183,41 @@ class Game:
                 
                 pygame.display.flip()
                 continue
+            
+            elif self.settings:
+                self.screen.blit(self.blured_bg, (0, 0))
+                self.screen.blit(self.overlay2, (0, 0))
                 
-            self.screen.fill((0, 0, 0))
+                pygame.draw.rect(self.screen, (102, 101, 100), self.button_rect3, border_radius=8)
+                pygame.draw.rect(self.screen, (0, 0, 0), self.button_rect3, width=4, border_radius=8)
+                
+                pygame.draw.rect(self.screen, (102, 101, 100), self.button_rect4, border_radius=8)
+                pygame.draw.rect(self.screen, (0, 0, 0), self.button_rect4, width=4, border_radius=8)
+                
+                pygame.draw.rect(self.screen, (50, 50, 50), self.button_rect5, border_radius=8)
+                pygame.draw.rect(self.screen, (0, 0, 0), self.button_rect5, width=4, border_radius=8)
+                
+                pygame.draw.rect(self.screen, (50, 50, 50), self.button_rect6, border_radius=8)
+                pygame.draw.rect(self.screen, (0, 0, 0), self.button_rect6, width=4, border_radius=8)
+                
+                pygame.draw.rect(self.screen, (50, 50, 50), self.button_rect7, border_radius=8)
+                pygame.draw.rect(self.screen, (0, 0, 0), self.button_rect7, width=4, border_radius=8)
+                
+                text_surface4 = self.font4.render("Settings", True, (0, 0, 0))
+                text_surface5 = self.font5.render("Brightness", True, (255, 255, 255))
+                text_surface6 = self.font6.render("+", True, (79, 191, 10))
+                text_surface7 = self.font6.render("-", True, (184, 18, 9))
+                text_surface8 = self.font7.render(str(self.Brightness) + "%", True, (255, 255, 255))
+                
+                self.screen.blit(text_surface4, (250, 120))
+                self.screen.blit(text_surface5, (170, 250))
+                self.screen.blit(text_surface6, (385, 235))
+                self.screen.blit(text_surface7, (577, 235))
+                self.screen.blit(text_surface8, (460, 250))
+
+                pygame.display.flip()
+                continue
+                
             self.screen.blit(self.scale_background, (0, 0))
             
             keys = pygame.key.get_pressed()
@@ -190,21 +270,20 @@ class Game:
             if  self.attacking:
                 self.player_anim_attack += 1
                 
-                total_duration_ticks = 24
-                ticks_per_frame = total_duration_ticks / len(self.attack_images)
+                total_duration_ticks = 24 / len(self.attack_images)
+                idx = int(self.player_anim_attack // total_duration_ticks)
                 
-                frame_index2 = int(self.player_anim_attack // ticks_per_frame)
-                
-                if frame_index2 >= len(self.attack_images):
+                if idx >= len(self.attack_images):
                     self.attacking = False
                     self.player_anim_attack = 0
-                    frame_index2 = len(self.attack_images) - 1
-                    
-                self.current_image = self.attack_images[frame_index2]
+                    idx = len(self.attack_images) - 1
+                self.current_image = self.attack_images[idx]
+            elif self.is_walking:
+                self.player_anim_walk += 1
+                self.current_image = self.walk_images[(self.player_anim_walk // 6) % len(self.walk_images)]
             else:
                 self.player_anim_idle += 1
-                idle_index = (self.player_anim_idle // 10) % len(self.idle_images)
-                self.current_image = self.idle_images[idle_index]
+                self.current_image = self.idle_images[(self.player_anim_idle // 6) % len(self.idle_images)]
             
             if self.fliped:
                 self.current_image = pygame.transform.flip(self.current_image, True, False)

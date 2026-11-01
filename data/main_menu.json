@@ -5,10 +5,40 @@
         "Play_Button_Y": 250,
         "Play_Button_X": 250
     },
-    "Play_Button2": {
+    "Main_Menu_Button2": {
         "Width2":  40,
         "Height2": 40,
-        "Play_Button_Y2": 310,
-        "Play_Button_X2": 265
+        "Main_Menu_Button_Y2": 310,
+        "Main_Menu_Button_X2": 265
+    },
+    "Settings_Button": {
+        "Width3":  500,
+        "Height3": 400,
+        "Settings_Button_Y3": 100,
+        "Settings_Button_X3": 150
+    },
+    "Settings_Button2": {
+        "Width4":  500,
+        "Height4": 100,
+        "Settings_Button_Y4": 100,
+        "Settings_Button_X4": 150
+    },
+    "Brightness_Button": {
+        "Width5":  200,
+        "Height5": 70,
+        "Settings_Button_Y5": 230,
+        "Settings_Button_X5": 160
+    },
+    "Brightness_Button2": {
+        "Width6":  60,
+        "Height6": 60,
+        "Brightness_Button_Y6": 235,
+        "Brightness_Button_X6": 370
+    },
+    "Brightness_Button3": {
+        "Width7":  60,
+        "Height7": 60,
+        "Brightness_Button_Y7": 235,
+        "Brightness_Button_X7": 585
     }
 }
