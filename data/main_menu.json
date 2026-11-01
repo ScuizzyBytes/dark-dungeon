@@ -40,5 +40,11 @@
         "Height7": 60,
         "Brightness_Button_Y7": 235,
         "Brightness_Button_X7": 585
+    },
+    "Settings_Button3": {
+        "Width8":  70,
+        "Height8": 70,
+        "Settings_Button_Y8": 100,
+        "Settings_Button_X8": 150
     }
 }

@@ -81,6 +81,11 @@ class Game:
         self.Button_Width6 = main_menu_data["Brightness_Button2"]["Width6"]
         self.Button_Height6 = main_menu_data["Brightness_Button2"]["Height6"]
         
+        self.Settings_Button_X8 = main_menu_data["Settings_Button3"]["Settings_Button_X8"]
+        self.Settings_Button_Y8 = main_menu_data["Settings_Button3"]["Settings_Button_Y8"]
+        self.Button_Width8 = main_menu_data["Settings_Button3"]["Width8"]
+        self.Button_Height8 = main_menu_data["Settings_Button3"]["Height8"]
+        
         # Images
         self.player_image = pygame.image.load("dark-dungeon/assets/player.png").convert_alpha()
         self.block_image = pygame.image.load("dark-dungeon/assets/block1.png").convert_alpha()
@@ -94,6 +99,7 @@ class Game:
         self.scaled_block1 = pygame.transform.scale(self.block1_image, (15, 20))
         self.scaled_player = pygame.transform.scale(self.player_image, (60, 70))
         self.scaled_settings = pygame.transform.scale(self.settings_image, (40, 40))
+        self.scaled_settings2 = pygame.transform.scale(self.settings_image, (70, 70))
         
         small_bg = pygame.transform.smoothscale(self.scale_background, (W // 10, H // 10))
         self.blured_bg = pygame.transform.smoothscale(small_bg, (W, H))
@@ -101,7 +107,9 @@ class Game:
         # ColorKeys
         self.scaled_player.set_colorkey((255, 255, 255))
         self.scaled_settings.set_colorkey((255, 255, 255))
-        self.settings_rect = self.scaled_settings.get_rect(topleft=(self.Settings_Button_X3, self.Settings_Button_Y3))
+        self.scaled_settings2.set_colorkey((255, 255, 255))
+        self.settings_rect = self.scaled_settings.get_rect(topleft=(self.Play_Button_X2, self.Play_Button_Y2))
+        self.settings_rect2 = self.scaled_settings2.get_rect(topleft=(720, 20))
         
         # Button
         self.button_rect = pygame.Rect(self.Play_Button_X, self.Play_Button_Y, self.Button_Width, self.Button_Height)
@@ -151,6 +159,18 @@ class Game:
                         elif self.settings_rect.collidepoint(event.pos):
                                 self.settings = True
                                 self.Main_Menu = False
+                    elif self.settings:
+                        if self.button_rect6.collidepoint(event.pos):
+                            self.Brightness = min(self.Brightness + 10, 100)
+                        elif self.button_rect7.collidepoint(event.pos):
+                            self.Brightness = max(self.Brightness - 10, 0)
+                    if not self.Main_Menu and self.settings_rect2.collidepoint(event.pos):
+                            self.settings = True
+                    if self.Main_Menu and self.settings_rect2.collidepoint(event.pos):
+                            self.settings = True
+                    if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE and not self.Main_Menu:
+                        self.settings = True
+                        self.Main_Menu = True
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE and not self.Main_Menu:
                     self.settings = True
                     self.Main_Menu = False
@@ -188,6 +208,11 @@ class Game:
                 self.screen.blit(self.blured_bg, (0, 0))
                 self.screen.blit(self.overlay2, (0, 0))
                 
+                pygame.draw.rect(self.screen, (50, 50, 50), self.button_rect3, border_radius=8)
+                
+                pygame.draw.rect(self.screen, (102, 101, 100), self.settings_rect, border_radius=8)
+                pygame.draw.rect(self.screen, (0, 0, 0), self.settings_rect, width=4, border_radius=8)
+                
                 pygame.draw.rect(self.screen, (102, 101, 100), self.button_rect3, border_radius=8)
                 pygame.draw.rect(self.screen, (0, 0, 0), self.button_rect3, width=4, border_radius=8)
                 
@@ -203,22 +228,27 @@ class Game:
                 pygame.draw.rect(self.screen, (50, 50, 50), self.button_rect7, border_radius=8)
                 pygame.draw.rect(self.screen, (0, 0, 0), self.button_rect7, width=4, border_radius=8)
                 
+                self.Rect_Brightness = pygame.Rect(370, 235, 60, 60)
+                self.Rect_Brightness = pygame.Rect(580, 235, 60, 60)
+                
                 text_surface4 = self.font4.render("Settings", True, (0, 0, 0))
                 text_surface5 = self.font5.render("Brightness", True, (255, 255, 255))
                 text_surface6 = self.font6.render("+", True, (79, 191, 10))
                 text_surface7 = self.font6.render("-", True, (184, 18, 9))
                 text_surface8 = self.font7.render(str(self.Brightness) + "%", True, (255, 255, 255))
+                text_surface9 = self.font5.render("To go back press ESC...", True, (255, 255, 255))
                 
                 self.screen.blit(text_surface4, (250, 120))
                 self.screen.blit(text_surface5, (170, 250))
                 self.screen.blit(text_surface6, (385, 235))
                 self.screen.blit(text_surface7, (577, 235))
                 self.screen.blit(text_surface8, (460, 250))
-
+                self.screen.blit(text_surface9, (200, 530))
                 pygame.display.flip()
                 continue
                 
             self.screen.blit(self.scale_background, (0, 0))
+            self.screen.blit(self.scaled_settings2, (720, 20))
             
             keys = pygame.key.get_pressed()
             
