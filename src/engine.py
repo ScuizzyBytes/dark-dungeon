@@ -1,4 +1,6 @@
 import json
+import os
+import random
 import sys
 
 import pygame
@@ -18,9 +20,6 @@ with open("dark-dungeon/data/player.json", "r", encoding="utf-8") as f:
 with open("dark-dungeon/data/main_menu.json", "r", encoding="utf-8") as f:
     main_menu_data = json.load(f)
     
-mixer.music.load("dark-dungeon/assets/background_musics/background_music1.wav")
-mixer.music.set_volume(0.5)
-mixer.music.play(-1)
 
 class Game:
     def __init__(self) -> None:
@@ -44,7 +43,7 @@ class Game:
         self.jumping = False
         self.gravity = 0.5  
         self.jump_strength = -10
-        self.ground_level = 490
+        self.ground_level = 440
         
         # Animations Variables
         self.is_walking = player_data["state"]["is_walking"]
@@ -93,16 +92,29 @@ class Game:
         self.Button_Height8 = main_menu_data["Settings_Button3"]["Height8"]
         
         # Images
-        self.player_image = pygame.image.load("dark-dungeon/assets/player.png").convert_alpha()
-        self.block_image = pygame.image.load("dark-dungeon/assets/block1.png").convert_alpha()
-        self.block1_image = pygame.image.load("dark-dungeon/assets/block.png").convert_alpha()
+        self.blocks_folder = "dark-dungeon/assets/blocks/"
+        self.gras_folder = "dark-dungeon/assets/gras_folder/"
+        self.stone_folder = "dark-dungeon/assets/stone_folder/"
         self.background = pygame.image.load("dark-dungeon/assets/background.png").convert_alpha()
+        self.player_image = pygame.image.load("dark-dungeon/assets/player.png").convert_alpha()
         self.settings_image = pygame.image.load("dark-dungeon/assets/settings.png").convert_alpha()
         
+        self.block_image = os.listdir(self.blocks_folder)
+        self.block_image1 = os.listdir(self.gras_folder)
+        self.block_image2 = os.listdir(self.stone_folder)
+
+        self.block_path1 = os.path.join(self.blocks_folder, self.block_image[0])
+        self.block_path2 = os.path.join(self.gras_folder, self.block_image1[0])
+        self.block_path3 = os.path.join(self.stone_folder, self.block_image2[0])
+
+        self.block_image = pygame.image.load(self.block_path1).convert_alpha()
+        self.block_image1 = pygame.image.load(self.block_path2).convert_alpha()
+        self.block_image2 = pygame.image.load(self.block_path3).convert_alpha()
+
         # Scaled Images
         self.scale_background = pygame.transform.scale(self.background, (W, H))
         self.scaled_block = pygame.transform.scale(self.block_image, (15, 15))
-        self.scaled_block1 = pygame.transform.scale(self.block1_image, (15, 20))
+        self.scaled_block1 = pygame.transform.scale(self.block_image1, (15, 15))
         self.scaled_player = pygame.transform.scale(self.player_image, (60, 70))
         self.scaled_settings = pygame.transform.scale(self.settings_image, (40, 40))
         self.scaled_settings2 = pygame.transform.scale(self.settings_image, (70, 70))
@@ -153,11 +165,23 @@ class Game:
         self.font5 = pygame.font.SysFont(None, 50) 
         self.font6 = pygame.font.SysFont(None, 80)
         self.font7 = pygame.font.SysFont(None, 50)
+        self.font8 = pygame.font.SysFont(None, 40)
         
         # Block Layers
-        self.blocks = [(x, 550) for x in range(0, 800, 15)]
-        self.layer1 = [(x, 565) for x in range(0, 800, 15)]
-        self.layer2 = [(x, 580) for x in range(0, 800, 15)]
+        world_start = -30000
+        world_end = 50000
+        
+        self.blocks = [(x, 500) for x in range(world_start, world_end, 15)]
+        self.layer1 = [(x, 515) for x in range(world_start, world_end, 15)]
+        self.layer2 = [(x, 530) for x in range(world_start, world_end, 15)]
+        self.layer3 = [(x, 545) for x in range(world_start, world_end, 15)]
+        self.layer4 = [(x, 560) for x in range(world_start, world_end, 15)]
+        self.layer5 = [(x, 575) for x in range(world_start, world_end, 15)]
+        self.layer6 = [(x, 590) for x in range(world_start, world_end, 15)]
+        
+        # Camera Variables
+        self.camera_x = 0
+        self.camera_y = 0
         
         self.walk_images = load_walk_animations()
         self.idle_images = load_idle_animations()
@@ -195,8 +219,6 @@ class Game:
                     self.counter += 1
                     if self.counter % 2 == 0:
                         self.settings = False
-                elif event.type == pygame.KEYDOWN and event.key == pygame.K_e and not self.settings and not self.Main_Menu:
-                    self.attacking = True
             
             if self.intro:
                 t = (pygame.time.get_ticks() - self.intro_start) / 1000 
@@ -287,9 +309,6 @@ class Game:
             self.screen.blit(self.scale_background, (0, 0))
             self.screen.blit(self.scaled_settings2, (720, 20))
             
-            self.dim.set_alpha(int((100 - self.Brightness) * 2.55 ))
-            self.screen.blit(self.dim, (0, 0))
-            
             keys = pygame.key.get_pressed()
             
             if keys[pygame.K_SPACE] and not self.jumping:
@@ -297,14 +316,29 @@ class Game:
                 self.jumping = True
             
             for b_x, b_y in self.blocks:
-                self.screen.blit(self.scaled_block, (b_x, b_y))
-            
+                self.screen.blit(self.block_image1, (b_x, b_y))
+                
             for b_x, b_y in self.layer1:
-                self.screen.blit(self.scaled_block1, (b_x, b_y))
+                self.screen.blit(self.block_image, (b_x, b_y))
                 
             for b_x, b_y in self.layer2:
-                self.screen.blit(self.scaled_block1, (b_x, b_y))
+                self.screen.blit(self.block_image, (b_x, b_y))
                 
+            for b_x, b_y in self.layer3:
+                self.screen.blit(self.block_image2, (b_x, b_y))
+                
+            for b_x, b_y in self.layer4:
+                self.screen.blit(self.block_image2, (b_x, b_y))
+                
+            for b_x, b_y in self.layer5:
+                self.screen.blit(self.block_image2, (b_x, b_y))
+                
+            for b_x, b_y in self.layer6:
+                self.screen.blit(self.block_image2, (b_x, b_y))
+                
+            self.dim.set_alpha(int((100 - self.Brightness) * 2.55 ))
+            self.screen.blit(self.dim, (0, 0))
+            
             self.velocity_y += self.gravity
             self.GROUND_Y += self.velocity_y
             
@@ -359,6 +393,67 @@ class Game:
                 self.current_image = pygame.transform.flip(self.current_image, True, False)
                 
             self.screen.blit(self.current_image, (self.GROUND_X, self.GROUND_Y))
+            
+            self.screen.blit(self.scale_background, (0, 0))
+            
+            # TODO: Camera
+            self.camera_x = self.GROUND_X - 400
+
+            for b_x, b_y in self.blocks:
+                self.screen.blit(self.block_image1, (b_x - self.camera_x, b_y))
+                
+            for b_x, b_y in self.layer1:
+                self.screen.blit(self.block_image, (b_x - self.camera_x, b_y))
+                
+            for b_x, b_y in self.layer2:
+                self.screen.blit(self.block_image, (b_x - self.camera_x, b_y))
+                
+            for b_x, b_y in self.layer3:
+                self.screen.blit(self.block_image2, (b_x - self.camera_x, b_y))
+
+            for b_x, b_y in self.layer4:
+                self.screen.blit(self.block_image2, (b_x - self.camera_x, b_y))
+                
+            for b_x, b_y in self.layer5:
+                self.screen.blit(self.block_image2, (b_x - self.camera_x, b_y))
+                
+            for b_x, b_y in self.layer6:
+                self.screen.blit(self.block_image2, (b_x - self.camera_x, b_y))
+
+            # TODO: FPS
+            pygame.draw.rect(self.screen, (0, 0, 0), (0, 0, 75, 35))
+            self.text_surface10 = self.font8.render(f"{self.clock.get_fps():.0f}", True, (14, 143, 14))
+            
+            self.screen.blit(self.text_surface10, (20, 5))
+            
+            self.screen.blit(self.current_image, (self.GROUND_X - self.camera_x, self.GROUND_Y))
+            
+            # TODO: Inventory
+            self.Iventory_Surface = pygame.Surface((300, 50), pygame.SRCALPHA)
+            self.Iventory_Surface.fill((0, 0, 0, 128))
+            
+            self.screen.blit(self.Iventory_Surface, (270, 550))
+            
+            self.Inventory_Slot1 = pygame.Rect(300, 560, 30, 30)
+            self.Inventory_Slot2 = pygame.Rect(340, 560, 30, 30)
+            self.Inventory_Slot3 = pygame.Rect(380, 560, 30, 30)
+            self.Inventory_Slot4 = pygame.Rect(420, 560, 30, 30)
+            self.Inventory_Slot5 = pygame.Rect(460, 560, 30, 30)
+            self.Inventory_Slot6 = pygame.Rect(500, 560, 30, 30)
+            
+            self.slot_width = 30
+            self.slot_height = 30
+            slots = [ 
+                self.Inventory_Slot1, 
+                self.Inventory_Slot2, 
+                self.Inventory_Slot3,
+                self.Inventory_Slot4, 
+                self.Inventory_Slot5,
+                self.Inventory_Slot6
+            ]
+            
+            for slot in slots:
+                pygame.draw.rect(self.screen, (255, 255, 255), slot, width=2)
 
             self.clock.tick(self.FPS)
             pygame.display.flip()
