@@ -4,12 +4,12 @@ import random
 import sys
 
 import pygame
-from frames_load import (
+from pygame import mixer
+from src.frames_load import (
     load_attack_animations,
     load_idle_animations,
     load_walk_animations,
 )
-from pygame import mixer
 
 pygame.init()
 mixer.init()
@@ -19,7 +19,10 @@ with open("dark-dungeon/data/player.json", "r", encoding="utf-8") as f:
     
 with open("dark-dungeon/data/main_menu.json", "r", encoding="utf-8") as f:
     main_menu_data = json.load(f)
-    
+
+mixer.music.load("dark-dungeon/assets/background_musics/background_music1.wav")
+mixer.music.set_volume(0.5)
+mixer.music.play(-1)
 
 class Game:
     def __init__(self) -> None:
