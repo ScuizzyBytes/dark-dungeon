@@ -30,7 +30,7 @@ class Game:
         self.Main_Menu = True
         self.settings = False
         self.counter = 0
-        self.Brightness = 80
+        self.Brightness = 50
         
         # Jumping Variables
         self.Jumping_High = 15
@@ -124,7 +124,7 @@ class Game:
         self.intro = True
         self.intro_start = pygame.time.get_ticks()
         self.intro_font = pygame.font.SysFont(None, 70)
-        self.intro_text = self.intro_font.render("Misha presents...", True, (255, 255, 255))
+        self.intro_text = self.intro_font.render("DEEPWAKE PRESENTS", True, (255, 255, 255))
         
         # Overlay Settings
         self.overlay = pygame.Surface((W, H))
@@ -135,12 +135,16 @@ class Game:
         self.overlay2.fill((0, 0, 0))
         self.overlay2.set_alpha(200)
         
+        # Dim Settings
+        self.dim = pygame.Surface((W, H))
+        self.dim.fill((0, 0, 0))
+        
         # Font Settings
         self.font = pygame.font.SysFont(None, 60)   
         self.font2 = pygame.font.SysFont(None, 120)
         self.font3 = pygame.font.SysFont(None, 120)
         self.font4 = pygame.font.SysFont(None, 100)
-        self.font5 = pygame.font.SysFont(None, 50)
+        self.font5 = pygame.font.SysFont(None, 50) 
         self.font6 = pygame.font.SysFont(None, 80)
         self.font7 = pygame.font.SysFont(None, 50)
         
@@ -171,7 +175,7 @@ class Game:
                         if self.button_rect6.collidepoint(event.pos):
                             self.Brightness = min(self.Brightness + 10, 100)
                         elif self.button_rect7.collidepoint(event.pos):
-                            self.Brightness = max(self.Brightness - 10, 0)
+                            self.Brightness = max(self.Brightness - 10, 10)
                     if not self.Main_Menu and self.settings_rect2.collidepoint(event.pos):
                             self.settings = True
                     if self.Main_Menu and self.settings_rect2.collidepoint(event.pos):
@@ -276,6 +280,9 @@ class Game:
                 
             self.screen.blit(self.scale_background, (0, 0))
             self.screen.blit(self.scaled_settings2, (720, 20))
+            
+            self.dim.set_alpha(int((100 - self.Brightness) * 2.55 ))
+            self.screen.blit(self.dim, (0, 0))
             
             keys = pygame.key.get_pressed()
             
