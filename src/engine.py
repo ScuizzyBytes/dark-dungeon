@@ -8,7 +8,6 @@ from frames_load import (
     load_idle_animations,
     load_walk_animations,
 )
-from noise import pnoise1, pnoise2
 from pygame import mixer
 
 pygame.init()
@@ -20,9 +19,6 @@ with open("dark-dungeon/data/player.json", "r", encoding="utf-8") as f:
 with open("dark-dungeon/data/main_menu.json", "r", encoding="utf-8") as f:
     main_menu_data = json.load(f)
 
-mixer.music.load("dark-dungeon/assets/background_musics/background_music1.wav")
-mixer.music.set_volume(0.5)
-mixer.music.play(-1)
 
 class Game:
     def __init__(self) -> None:
@@ -38,7 +34,7 @@ class Game:
         self.Main_Menu = True
         self.settings = False
         self.counter = 0
-        self.Brightness = 80
+        self.Brightness = 80    
         
         # Jumping Variables
         self.Jumping_High = 15
@@ -94,6 +90,16 @@ class Game:
         self.Button_Width8 = main_menu_data["Settings_Button3"]["Width8"]
         self.Button_Height8 = main_menu_data["Settings_Button3"]["Height8"]
         
+        self.Play_Music_Button_x = main_menu_data["Play_Music_Button"]["Settings_Button_X11"]
+        self.Play_Music_Button_y = main_menu_data["Play_Music_Button"]["Settings_Button_Y11"]
+        self.Play_Music_Button_width = main_menu_data["Play_Music_Button"]["Width11"]
+        self.Play_Music_Button_height = main_menu_data["Play_Music_Button"]["Height11"]
+        
+        self.Play_Music_Button_x2 = main_menu_data["Brightness_Button4"]["Brightness_Button_X12"]
+        self.Play_Music_Button_y2 = main_menu_data["Brightness_Button4"]["Brightness_Button_Y12"]
+        self.Play_Music_Button_width2 = main_menu_data["Brightness_Button4"]["Width12"]
+        self.Play_Music_Button_height2 = main_menu_data["Brightness_Button4"]["Height12"]
+        
         # Images
         self.blocks_folder = "dark-dungeon/assets/blocks/"
         self.gras_folder = "dark-dungeon/assets/gras_folder/"
@@ -140,6 +146,9 @@ class Game:
         self.button_rect5 = pygame.Rect(self.Brightness_Button_X5, self.Brightness_Button_Y5, self.Button_Width5, self.Button_Height5)
         self.button_rect6 = pygame.Rect(self.Brightness_Button_X6, self.Brightness_Button_Y6, self.Button_Width6, self.Button_Height6)
         self.button_rect7 = pygame.Rect(self.Brightness_Button_X6 + 185, self.Brightness_Button_Y6, self.Button_Width6, self.Button_Height6)
+        self.button_rect8 = pygame.Rect(self.Play_Music_Button_x2, self.Play_Music_Button_y2, self.Play_Music_Button_width2, self.Play_Music_Button_height2)
+        self.button_rect9 = pygame.Rect(self.Play_Music_Button_x2 + 120, self.Play_Music_Button_y2, self.Play_Music_Button_width2, self.Play_Music_Button_height2)
+        self.Play_Music_Button_Rect = pygame.Rect(self.Play_Music_Button_x, self.Play_Music_Button_y, self.Play_Music_Button_width, self.Play_Music_Button_height)
         
         # Intro Variables
         self.intro = True
@@ -217,6 +226,8 @@ class Game:
                     if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE and not self.Main_Menu:
                         self.settings = True
                         self.Main_Menu = True
+                    if event.type == pygame.MOUSEBUTTONDOWN and not self.Main_Menu and not self.settings:
+                        self.attacking = True
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE and not self.Main_Menu:
                     self.settings = True
                     self.Main_Menu = False
@@ -263,7 +274,6 @@ class Game:
                 self.screen.blit(self.text_surface3, (142.5, 122.5))
                 self.screen.blit(self.text_surface2, (145, 125))
                 self.screen.blit(self.scaled_settings, (265, 310))
-                
                 pygame.display.flip()
                 continue
             
@@ -271,10 +281,10 @@ class Game:
                 self.screen.blit(self.blured_bg, (0, 0))
                 self.screen.blit(self.overlay2, (0, 0))
                 
-                pygame.draw.rect(self.screen, (50, 50, 50), self.button_rect3, border_radius=8)
-                
                 pygame.draw.rect(self.screen, (102, 101, 100), self.settings_rect, border_radius=8)
                 pygame.draw.rect(self.screen, (0, 0, 0), self.settings_rect, width=4, border_radius=8)
+                
+                pygame.draw.rect(self.screen, (50, 50, 50), self.button_rect3, border_radius=8)
                 
                 pygame.draw.rect(self.screen, (102, 101, 100), self.button_rect3, border_radius=8)
                 pygame.draw.rect(self.screen, (0, 0, 0), self.button_rect3, width=4, border_radius=8)
@@ -291,6 +301,15 @@ class Game:
                 pygame.draw.rect(self.screen, (50, 50, 50), self.button_rect7, border_radius=8)
                 pygame.draw.rect(self.screen, (0, 0, 0), self.button_rect7, width=4, border_radius=8)
                 
+                pygame.draw.rect(self.screen, (50, 50, 50), self.Play_Music_Button_Rect, border_radius=8)
+                pygame.draw.rect(self.screen, (0, 0, 0), self.Play_Music_Button_Rect, width=4, border_radius=8)
+                
+                pygame.draw.rect(self.screen, (50, 50, 50), self.button_rect8, border_radius=8)
+                pygame.draw.rect(self.screen, (0, 0, 0), self.button_rect8, width=4, border_radius=8)
+                
+                pygame.draw.rect(self.screen, (50, 50, 50), self.button_rect9, border_radius=8)
+                pygame.draw.rect(self.screen, (0, 0, 0), self.button_rect9, width=4, border_radius=8)
+                
                 self.Rect_Brightness = pygame.Rect(370, 235, 60, 60)
                 self.Rect_Brightness = pygame.Rect(580, 235, 60, 60)
                 
@@ -300,6 +319,9 @@ class Game:
                 text_surface7 = self.font6.render("-", True, (184, 18, 9))
                 text_surface8 = self.font7.render(str(self.Brightness) + "%", True, (255, 255, 255))
                 text_surface9 = self.font5.render("To go back press ESC...", True, (255, 255, 255))
+                text_surface10 = self.font5.render("Play Music", True, (255, 255, 255))
+                text_surface11 = self.font7.render("OFF", True, (0, 0, 0))
+                text_surface12 = self.font7.render("ON", True, (255, 255, 255))
                 
                 self.screen.blit(text_surface4, (250, 120))
                 self.screen.blit(text_surface5, (170, 250))
@@ -307,6 +329,9 @@ class Game:
                 self.screen.blit(text_surface7, (577, 235))
                 self.screen.blit(text_surface8, (460, 250))
                 self.screen.blit(text_surface9, (200, 530))
+                self.screen.blit(text_surface10, (170, 345))
+                self.screen.blit(text_surface11, (400, 345))
+                self.screen.blit(text_surface12, (530, 345))
                 pygame.display.flip()
                 continue
             

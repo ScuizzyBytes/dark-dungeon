@@ -46,5 +46,17 @@
         "Height8": 70,
         "Settings_Button_Y8": 100,
         "Settings_Button_X8": 150
+    },
+    "Play_Music_Button": {
+        "Width11":  210,
+        "Height11": 60,
+        "Settings_Button_Y11": 330,
+        "Settings_Button_X11": 160
+    },
+    "Brightness_Button4": {
+        "Width12": 110,
+        "Height12": 60,
+        "Brightness_Button_Y12": 330,
+        "Brightness_Button_X12": 380
     }
 }
