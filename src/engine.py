@@ -13,10 +13,15 @@ from pygame import mixer
 pygame.init()
 mixer.init()
 
-with open("dark-dungeon/data/player.json", "r", encoding="utf-8") as f:
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+player_path = os.path.join(BASE_DIR, "../data/player.json")
+menu_path = os.path.join(BASE_DIR, "../data/main_menu.json")
+
+with open(player_path, "r", encoding="utf-8") as f:
     player_data = json.load(f)
     
-with open("dark-dungeon/data/main_menu.json", "r", encoding="utf-8") as f:
+with open(menu_path, "r", encoding="utf-8") as f:
     main_menu_data = json.load(f)
 
 
@@ -26,7 +31,7 @@ class Game:
         W, H = 800, 600
         self.screen = pygame.display.set_mode((W, H))
         pygame.display.set_caption("The Last Vein")
-        self.clock = pygame.time.Clock()
+        self.clock = pygame.time.Clock() 
         self.FPS = 60
         self.GROUND_X, self.GROUND_Y = 400, 500
         self.Block_x, self.Block_y = 0, 550
@@ -34,7 +39,7 @@ class Game:
         self.Main_Menu = True
         self.settings = False
         self.counter = 0
-        self.Brightness = 80    
+        self.Brightness = 80
         
         # Jumping Variables
         self.Jumping_High = 15
@@ -104,10 +109,14 @@ class Game:
         self.blocks_folder = "dark-dungeon/assets/blocks/"
         self.gras_folder = "dark-dungeon/assets/gras_folder/"
         self.stone_folder = "dark-dungeon/assets/stone_folder/"
-        self.background = pygame.image.load("dark-dungeon/assets/background.png").convert()
-        self.player_image = pygame.image.load("dark-dungeon/assets/player.png").convert()
-        self.settings_image = pygame.image.load("dark-dungeon/assets/settings.png").convert()
+        self.blocks_folder = os.path.join(BASE_DIR, "../assets/blocks/")
+        self.gras_folder = os.path.join(BASE_DIR, "../assets/gras_folder/")
+        self.stone_folder = os.path.join(BASE_DIR, "../assets/stone_folder/")
         
+        self.background = pygame.image.load(os.path.join(BASE_DIR, "../assets/background.png")).convert()
+        self.player_image = pygame.image.load(os.path.join(BASE_DIR, "../assets/player.png")).convert()
+        self.settings_image = pygame.image.load(os.path.join(BASE_DIR, "../assets/settings.png")).convert()
+                
         self.block_image = os.listdir(self.blocks_folder)
         self.block_image1 = os.listdir(self.gras_folder)
         self.block_image2 = os.listdir(self.stone_folder)
@@ -199,7 +208,7 @@ class Game:
         self.walk_images = load_walk_animations()
         self.idle_images = load_idle_animations()
         self.attack_images = load_attack_animations()
-
+                
     def run(self):
         while self.running:
             for event in pygame.event.get():
@@ -339,7 +348,7 @@ class Game:
             
             if keys[pygame.K_SPACE] and not self.jumping:
                 self.velocity_y = self.jump_strength
-                self.jumping = True     
+                self.jumping = True
             
             self.screen.blit(self.scale_background, (0, 0))
                 

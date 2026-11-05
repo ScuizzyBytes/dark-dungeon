@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="blocks_mc">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/assets/files/blocks_mc.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
